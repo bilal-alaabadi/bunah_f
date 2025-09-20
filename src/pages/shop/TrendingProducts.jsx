@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import RatingStars from '../../components/RatingStars';
 import { useFetchAllProductsQuery } from '../../redux/features/products/productsApi';
 import { useSelector } from 'react-redux';
-import log from "../../assets/Screenshot_2025-08-23_183158-removebg-preview.png"; // شعار الأنثور
+import log from "../../assets/Bunnah_logo_no_bg.png"; // شعار الأنثور
 
 const TrendingProducts = ({ onProductsLoaded }) => {
   const [visibleProducts, setVisibleProducts] = useState(4);
@@ -64,11 +64,11 @@ const TrendingProducts = ({ onProductsLoaded }) => {
   return (
     <section className="section__container product__container">
       <div className="relative text-center" dir="rtl">
-        <h2 className="text-[32px] font-normal text-[#CB908B] mb-1"> أحدث المنتجات</h2>
+        <h2 className="text-[32px] font-normal text-[#751e26] mb-1"> أحدث المنتجات</h2>
 
         <div className="flex items-center justify-center gap-3 relative z-10">
           <span className="flex-1 max-w-[100px] h-px bg-[#c8c5b9]"></span>
-          <img src={log} alt="شعار الأنثور" className="h-20 w-auto object-contain" />
+          <img src={log} alt="شعار الأنثور" className="h-28 w-auto object-contain" />
           <span className="flex-1 max-w-[100px] h-px bg-[#c8c5b9]"></span>
         </div>
       </div>
@@ -93,7 +93,7 @@ const TrendingProducts = ({ onProductsLoaded }) => {
                 className="product__card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative flex flex-col h-full"
               >
                 {oldPrice && oldPrice !== price && (
-                  <div className="absolute top-3 left-3 bg-[#CB908B] text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+                  <div className="absolute top-3 left-3 bg-[#751e26] text-white text-xs font-bold px-2 py-1 rounded-full z-10">
                     خصم {discountPercentage}%
                   </div>
                 )}

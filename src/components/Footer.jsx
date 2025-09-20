@@ -1,5 +1,5 @@
 import React from "react";
-import log from "../assets/Screenshot_2025-08-23_183158-removebg-preview.png"; // شعار RF_COLLECTION
+import log from "../assets/Bunnah_logo_no_bg.png"; // شعار RF_COLLECTION
 import {
   SiVisa,
   SiMastercard,
@@ -7,6 +7,8 @@ import {
   SiGooglepay,
 } from "react-icons/si";
 import { FaInstagram, FaWhatsapp, FaSnapchatGhost, FaTiktok } from "react-icons/fa";
+import Thw from "../assets/images__4_-removebg-preview.png";
+
 
 const Footer = () => {
   return (
@@ -20,7 +22,7 @@ const Footer = () => {
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <path d="M28 0 H100 V36 H28 A28 28 0 0 1 28 0 Z" fill="#CB908B" />
+          <path d="M28 0 H100 V36 H28 A28 28 0 0 1 28 0 Z" fill="#751e26" />
         </svg>
 
         {/* محتوى الشريط */}
@@ -42,8 +44,11 @@ const Footer = () => {
                   <SiVisa className="text-3xl md:text-4xl drop-shadow-sm" />
                   <SiMastercard className="text-3xl md:text-4xl drop-shadow-sm" />
                   <SiApplepay className="text-3xl md:text-4xl drop-shadow-sm" />
-                  <SiGooglepay className="text-3xl md:text-4xl drop-shadow-sm" />
-                </div>
+                  <img
+                    src={Thw}
+                    className="w-10 invert brightness-0"
+                    alt="Thawani"
+                  />                </div>
               </div>
 
               <p className="text-right text-lg md:text-2xl font-semibold leading-relaxed">
@@ -59,7 +64,7 @@ const Footer = () => {
 
       {/* الأقسام السفلية */}
       <div className="max-w-7xl mx-auto px-4 ">
-        <div className="py-10 grid grid-cols-1 md:grid-cols-3 gap-10  bg-white text-[#CB908B] md:text-right text-center">
+        <div className="py-10 grid grid-cols-1 md:grid-cols-3 gap-10  bg-white text-[#751e26] md:text-right text-center">
           {/* RF_COLLECTION */}
           {/* <div>
             <h4 className="text-xl font-bold mb-3">RF_COLLECTION</h4>
@@ -95,10 +100,10 @@ const Footer = () => {
           {/* تواصل معنا */}
           <div>
             <h4 className="text-xl font-bold mb-3">تواصل معنا</h4>
-            <p className="text-sm mb-4">+96892760882</p>
+            <p className="text-sm mb-4">+96897531116</p>
             <div className="flex justify-center md:justify-end gap-4 ">
               <a
-                href="https://www.instagram.com/rf_collection999/"
+                href="https://www.instagram.com/bunah.3/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className=" hover:text-[#9B2D1F] transition"
@@ -106,23 +111,23 @@ const Footer = () => {
                 <FaInstagram className="text-xl" />
               </a>
               <a
-                href="https://api.whatsapp.com/send/?phone=96892760882&text&type=phone_number&app_absent=0"
+                href="https://api.whatsapp.com/send/?phone=96897531116&text&type=phone_number&app_absent=0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className=" hover:text-[#9B2D1F] transition"
               >
                 <FaWhatsapp className="text-xl" />
               </a>
-              <a
+              {/* <a
                 href="https://www.snapchat.com/add/rf_collectio999"
                 target="_blank"
                 rel="noopener noreferrer"
                 className=" hover:text-[#9B2D1F] transition"
               >
                 <FaSnapchatGhost className="text-xl" />
-              </a>
+              </a> */}
               <a
-                href="https://www.tiktok.com/@rf_collection_999"
+                href="https://www.tiktok.com/@bunah.3"
                 target="_blank"
                 rel="noopener noreferrer"
                 className=" hover:text-[#9B2D1F] transition"
@@ -134,8 +139,8 @@ const Footer = () => {
         </div>
 
         {/* الحقوق */}
-        <div className="border-t border-[#CB908B]/30 pt-4 pb-8 text-center text-sm text-[#CB908B]" dir="rtl">
-          جميع الحقوق محفوظة لدى RF_COLLECTION —{" "}
+        <div className="border-t border-[#CB908B]/30 pt-4 pb-8 text-center text-sm text-[#751e26]" dir="rtl">
+          جميع الحقوق محفوظة لدى بـُنة —{" "}
           <a
             href="https://www.instagram.com/mobadeere/"
             target="_blank"

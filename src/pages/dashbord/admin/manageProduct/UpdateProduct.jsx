@@ -10,13 +10,11 @@ import UploadImage from '../manageProduct/UploadImag';
 
 const categories = [
   { label: 'أختر منتج', value: '' },
-  { label: 'تفصيل العبايات', value: 'تفصيل العبايات' },
-  { label: 'الشيلات فرنسية', value: 'الشيلات فرنسية' },
-  { label: 'الشيلات سادة', value: 'الشيلات سادة' },
-  { label: 'العطور', value: 'العطور' },
-  { label: 'دريسات', value: 'دريسات' },
+  { label: 'المحامص السعودية', value: 'المحامص السعودية' },
+  { label: 'المحامص العمانية', value: 'المحامص العمانية' },
+  { label: 'أدوات قهوة', value: 'أدوات قهوة' },
+  { label: 'شاي', value: 'شاي' },
 ];
-
 const sizes = [
   { label: 'اختر الحجم', value: '' },
   { label: '1 كيلو', value: '1 كيلو' },

@@ -1,25 +1,26 @@
 // HeroSection.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import card1 from "../../assets/IMG_0064.jpg";
-import card2 from "../../assets/IMG_3440.png";
-import card3 from "../../assets/IMG_3441.png";
-import card4 from "../../assets/IMG_0067.jpg";
-import log from "../../assets/Screenshot_2025-08-23_183158-removebg-preview.png"; // شعار الأنثور
+import card1 from "../../assets/ChatGPT Image Sep 20, 2025, 02_10_00 PM.png";
+import card2 from "../../assets/ChatGPT Image Sep 20, 2025, 02_34_24 PM.png";
+import card3 from "../../assets/ChatGPT Image Sep 20, 2025, 02_37_14 PM.png";
+import card4 from "../../assets/ChatGPT Image Sep 20, 2025, 02_50_18 PM.png";
+import log from "../../assets/Bunnah_logo_no_bg.png"; // شعار الأنثور
 
 const cards = [
-  { id: 1, image: card1, trend: '  ', title: 'تفصيل العبايات' },
-  { id: 4, image: card4, trend: ' ',  title: 'دريسات' },
-  { id: 2, image: card2, trend: '  ', title: 'الشيلات' },
-  { id: 3, image: card3, trend: '  ', title: 'العطور' },
+  { id: 1, image: card1, trend: '  ', title: 'المحامص السعودية' },
+  { id: 2, image: card2, trend: ' ',  title: 'المحامص العمانية' },
+  { id: 3, image: card3, trend: ' ',  title: 'أدوات قهوة' },
+  { id: 4, image: card4, trend: ' ',  title: 'شاي'},
+
 ];
 
 // خريطة ربط عناوين الكروت مع فلاتر المتجر الموجودة
 const categoryMap = {
-  'تفصيل العبايات': 'تفصيل العبايات',
-  'دريسات': 'دريسات',
-  'العطور': 'العطور',
-  'الشيلات': 'الشيلات سادة', // ينقله مباشرة لفلتر الشيلات
+  'المحامص السعودية': 'المحامص السعودية',
+  'المحامص العمانية': 'المحامص العمانية',
+  'أدوات قهوة': 'أدوات قهوة',
+  'شاي': 'شاي',
 };
 
 const HeroSection = () => {
@@ -33,12 +34,12 @@ const HeroSection = () => {
   return (
     <section className=' px-4 py-8'>
       <div className="relative text-center" dir="rtl">
-        <h2 className="text-[32px] font-normal text-[#CB908B] mb-1">أستكشف مجموعاتنا المميزة</h2>
+        <h2 className="text-[32px] font-normal text-[#751e26] mb-1">أستكشف مجموعاتنا المميزة</h2>
         <p className="text-[32px] font-bold text-[#3c3c3c] mb-4">عبر أقسامنا الفريدة</p>
 
         <div className="flex items-center justify-center gap-3 relative z-10">
           <span className="flex-1 max-w-[100px] h-px bg-[#c8c5b9]"></span>
-          <img src={log} alt="شعار الأنثور" className="h-20 w-auto object-contain" />
+          <img src={log} alt="شعار الأنثور" className="h-32 w-auto object-contain" />
           <span className="flex-1 max-w-[100px] h-px bg-[#c8c5b9]"></span>
         </div>
       </div>

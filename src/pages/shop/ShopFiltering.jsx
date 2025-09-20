@@ -33,7 +33,7 @@ const ShopFiltering = ({ filters, filtersState, setFiltersState, clearFilters })
       {/* مسح الفلاتر */}
       <button
         onClick={clearFilters}
-        className='bg-[#CB908B]  py-1 px-4 text-white rounded'
+        className='bg-[#751e26]  py-1 px-4 text-white rounded'
       >
         مسح كل الفلاتر
       </button>
