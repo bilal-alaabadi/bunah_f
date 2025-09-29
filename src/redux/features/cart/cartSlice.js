@@ -1,4 +1,3 @@
-// ========================= src/redux/slices/cartSlice.js =========================
 import { createSlice } from "@reduxjs/toolkit";
 
 /* ------------------------ أدوات تخزين الحالة محليًا ------------------------ */
@@ -12,13 +11,12 @@ const DEFAULTS = {
   giftCard: null,  // { from, to, phone, note }
 };
 
-// استعادة الحالة من localStorage إن وجدت، مع الدمج مع الافتراضيات
+// استعادة الحالة من localStorage إن وجدت
 const loadState = () => {
   try {
     const raw = localStorage.getItem("cartState");
     if (!raw) return { ...DEFAULTS };
     const parsed = JSON.parse(raw);
-    // ندمج الافتراضيات لمنع فقدان الحقول الجديدة مثل giftCard
     return { ...DEFAULTS, ...parsed };
   } catch {
     return { ...DEFAULTS };
@@ -39,7 +37,6 @@ const trim = (v) => (v ?? "").toString().trim();
 const hasGiftValues = (gc) =>
   !!(gc && (trim(gc.from) || trim(gc.to) || trim(gc.phone) || trim(gc.note)));
 
-// مفتاح فريد للبند = المنتج + القياسات + (بطاقة الهدية إن وُجدت)
 const makeLineKey = (p) => {
   const id = p?._id || p?.productId || "";
   const m = p?.measurements ? JSON.stringify(p.measurements) : "{}";
@@ -58,20 +55,20 @@ const makeLineKey = (p) => {
   return `${id}::${m}::${gift}`;
 };
 
-// حساب إجمالي السطر بعد خصم الأزواج في العملة الأساسية (ر.ع.)
+// حساب إجمالي السطر بعد خصم الأزواج
 const lineTotalBase = (product) => {
-  const unit = Number(product.price || 0); // سعر الوحدة بالأساس (ر.ع.)
+  const unit = Number(product.price || 0);
   const qty = Number(product.quantity || 0);
   const isShayla =
     product.category === "الشيلات فرنسية" ||
     product.category === "الشيلات سادة";
   const pairs = isShayla ? Math.floor(qty / 2) : 0;
-  const pairDiscount = pairs * 1; // 1 ر.ع لكل زوج
+  const pairDiscount = pairs * 1;
   const subtotal = unit * qty;
   return Math.max(0, subtotal - pairDiscount);
 };
 
-// مجاميع عامة
+// مجاميع
 export const setSelectedItems = (state) =>
   state.products.reduce((total, product) => total + Number(product.quantity || 0), 0);
 
@@ -91,20 +88,21 @@ const cartSlice = createSlice({
       const payload = action.payload;
       const _id = payload._id || payload.productId;
       const quantityToAdd = Math.max(1, Number(payload.quantity || 1));
+      const stockQty = Number(payload.stockQty ?? Infinity); // الكمية المتاحة
       const lineKey = makeLineKey(payload);
 
-      // ابحث عن بند مطابق لنفس المنتج ونفس القياسات ونفس بيانات الهدية
       const existing = state.products.find(
         (p) => p._id === _id && makeLineKey(p) === lineKey
       );
 
       if (existing) {
-        existing.quantity += quantityToAdd;
+        const newQty = Math.min(existing.quantity + quantityToAdd, stockQty);
+        existing.quantity = newQty;
       } else {
         state.products.push({
           ...payload,
           _id,
-          quantity: quantityToAdd,
+          quantity: Math.min(quantityToAdd, stockQty),
         });
       }
 
@@ -115,7 +113,6 @@ const cartSlice = createSlice({
 
     // تحديث الكمية
     updateQuantity: (state, action) => {
-      // يدعم { id, type, lineKey }
       const { id, type, lineKey } = action.payload;
       const product = state.products.find((p) => {
         if (lineKey) return makeLineKey(p) === lineKey;
@@ -123,8 +120,15 @@ const cartSlice = createSlice({
       });
 
       if (product) {
-        if (type === "increment") product.quantity += 1;
-        else if (type === "decrement" && product.quantity > 1) product.quantity -= 1;
+        const stockQty = Number(product.stockQty ?? Infinity);
+
+        if (type === "increment") {
+          if (product.quantity < stockQty) {
+            product.quantity += 1;
+          }
+        } else if (type === "decrement" && product.quantity > 1) {
+          product.quantity -= 1;
+        }
       }
 
       state.selectedItems = setSelectedItems(state);
@@ -134,7 +138,6 @@ const cartSlice = createSlice({
 
     // إزالة عنصر
     removeFromCart: (state, action) => {
-      // يقبل إما: removeFromCart({ id, lineKey }) أو removeFromCart(id)
       let id, lineKey;
       if (typeof action.payload === "string") {
         id = action.payload;
@@ -158,12 +161,11 @@ const cartSlice = createSlice({
       state.products = [];
       state.selectedItems = 0;
       state.totalPrice = 0;
-      state.giftCard = null; // تنظيف بطاقة الهدية عند تفريغ السلة
+      state.giftCard = null;
       saveState(state);
     },
 
     // تغيير الدولة (يضبط الشحن)
-    // "عمان" => 2 ر.ع | "الإمارات" => 4 ر.ع | "دول الخليج" => 5 ر.ع
     setCountry: (state, action) => {
       state.country = action.payload;
       if (action.payload === "الإمارات") {
@@ -171,19 +173,19 @@ const cartSlice = createSlice({
       } else if (action.payload === "دول الخليج") {
         state.shippingFee = 5;
       } else {
-        state.shippingFee = 2; // عمان
+        state.shippingFee = 2;
       }
       saveState(state);
     },
 
-    // تحميل حالة مخصّصة (لو احتجتها)
+    // تحميل حالة مخصّصة
     loadCart: (state, action) => {
       const merged = { ...DEFAULTS, ...(action.payload || {}) };
       saveState(merged);
       return merged;
     },
 
-    /* ------------------------ بطاقة الهدية على مستوى الطلب ------------------------ */
+    // بطاقة الهدية
     setGiftCard: (state, action) => {
       const { from = "", to = "", phone = "", note = "" } = action.payload || {};
       const allEmpty = [from, to, phone, note].every((v) => !String(v || "").trim());

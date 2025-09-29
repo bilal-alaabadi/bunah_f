@@ -1,3 +1,4 @@
+// ========================= redux/features/products/productsApi.js =========================
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getBaseUrl } from "../../../utils/baseURL";
 
@@ -9,6 +10,7 @@ const productsApi = createApi({
   }),
   tagTypes: ["Product", "ProductList"],
   endpoints: (builder) => ({
+
     // جلب جميع المنتجات مع إمكانية التصفية والترتيب
     fetchAllProducts: builder.query({
       query: ({
@@ -50,28 +52,29 @@ const productsApi = createApi({
           : ["ProductList"],
     }),
 
-fetchProductById: builder.query({
-  query: (id) => `/product/${id}`, // تغيير المسار هنا
-  transformResponse: (response) => {
-    if (!response?.product) {
-      throw new Error('المنتج غير موجود');
-    }
-    
-    const { product } = response;
-    return {
-      _id: product._id,
-      name: product.name,
-      category: product.category,
-      size: product.size || '',
-      price: product.price,
-      oldPrice: product.oldPrice || '',
-      description: product.description,
-      image: Array.isArray(product.image) ? product.image : [product.image],
-      author: product.author
-    };
-  },
-  providesTags: (result, error, id) => [{ type: "Product", id }],
-}),
+    // جلب منتج واحد (مع stockQty)
+    fetchProductById: builder.query({
+      query: (id) => `/product/${id}`,
+      transformResponse: (response) => {
+        if (!response?.product) {
+          throw new Error('المنتج غير موجود');
+        }
+        const { product } = response;
+        return {
+          _id: product._id,
+          name: product.name,
+          category: product.category,
+          size: product.size || '',
+          price: product.price,
+          oldPrice: product.oldPrice || '',
+          description: product.description,
+          image: Array.isArray(product.image) ? product.image : [product.image],
+          author: product.author,
+          stockQty: product.stockQty ?? 0   // ← هام: إرجاع الكمية
+        };
+      },
+      providesTags: (result, error, id) => [{ type: "Product", id }],
+    }),
 
     // جلب المنتجات المرتبطة (منتجات مشابهة)
     fetchRelatedProducts: builder.query({
@@ -128,6 +131,7 @@ fetchProductById: builder.query({
             ? product.price 
             : product.regularPrice,
           images: Array.isArray(product.image) ? product.image : [product.image],
+          stockQty: product.stockQty ?? 0, // متاح أيضًا في نتائج البحث إن أردت عرضه
         }));
       },
       providesTags: (result) =>
