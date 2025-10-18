@@ -24,6 +24,27 @@ const WEIGHTS = [
 
 const ROAST_CATEGORIES = ['المحامص العمانية', 'المحامص السعودية'];
 
+const ROASTERS = [
+  { label: '— بدون تحديد —', value: '' },
+  { label: 'محمصة الرياض', value: 'محمصة الرياض' },
+  { label: 'محمصة بريهانت', value: 'محمصة بريهانت' },
+  { label: 'محمصة اورو', value: 'محمصة اورو' },
+  { label: 'محمصة سويل', value: 'محمصة سويل' },
+  { label: 'محمصة الفارس الاسود', value: 'محمصة الفارس الاسود' },
+  { label: 'محمصة اش', value: 'محمصة اش' },
+  { label: 'محمصة ترايسكل', value: 'محمصة ترايسكل' },
+  { label: 'محمصة دبليو', value: 'محمصة دبليو' },
+  { label: 'محمصة سبعة جرام', value: 'محمصة سبعة جرام' },
+  { label: 'محمصة بيت التحميص', value: 'محمصة بيت التحميص' },
+  { label: 'محمصة صواع', value: 'محمصة صواع' },
+  { label: 'محمصة هاف مليون', value: 'محمصة هاف مليون' },
+  { label: 'محمصة عُمق', value: 'محمصة عُمق' },
+  { label: 'محمصة 12 كوب', value: 'محمصة 12 كوب' },
+  { label: 'محمصة اولالا', value: 'محمصة اولالا' },
+  { label: 'محمصة كوف', value: 'محمصة كوف' },
+  { label: 'محمصة كفة', value: 'محمصة كفة' },
+];
+
 const AddProduct = () => {
   const { user } = useSelector((state) => state.auth);
 
@@ -36,6 +57,7 @@ const AddProduct = () => {
     inStock: true,
     size: '',
     weightGrams: null,
+    roasterName: '', // اسم المحمصة (اختياري)
   });
 
   const [image, setImage] = useState([]);
@@ -60,6 +82,7 @@ const AddProduct = () => {
         ...prev,
         category: value,
         weightGrams: ROAST_CATEGORIES.includes(value) ? prev.weightGrams : null,
+        roasterName: ROAST_CATEGORIES.includes(value) ? prev.roasterName : '',
       }));
       return;
     }
@@ -98,7 +121,6 @@ const AddProduct = () => {
     try {
       await addProduct({
         ...product,
-        // الاسم يُرسل خام بدون وزن — السيرفر هو من يلصق الوزن مرة واحدة
         name: product.name,
         image,
         author: user?._id,
@@ -115,6 +137,7 @@ const AddProduct = () => {
         inStock: true,
         size: '',
         weightGrams: null,
+        roasterName: '',
       });
       setImage([]);
       navigate('/shop');
@@ -146,33 +169,43 @@ const AddProduct = () => {
         />
 
         {isRoastCategory && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              اختر الوزن
-            </label>
-            <div className="flex flex-wrap gap-3">
-              {WEIGHTS.map((w) => (
-                <label
-                  key={w.value}
-                  className={`cursor-pointer border rounded-lg px-3 py-2 ${
-                    Number(product.weightGrams) === w.value
-                      ? 'border-amber-600'
-                      : 'border-gray-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="weightGrams"
-                    value={w.value}
-                    checked={Number(product.weightGrams) === w.value}
-                    onChange={handleChange}
-                    className="mr-2"
-                  />
-                  {w.label}
-                </label>
-              ))}
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                اختر الوزن
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {WEIGHTS.map((w) => (
+                  <label
+                    key={w.value}
+                    className={`cursor-pointer border rounded-lg px-3 py-2 ${
+                      Number(product.weightGrams) === w.value
+                        ? 'border-amber-600'
+                        : 'border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="weightGrams"
+                      value={w.value}
+                      checked={Number(product.weightGrams) === w.value}
+                      onChange={handleChange}
+                      className="mr-2"
+                    />
+                    {w.label}
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+
+            <SelectInput
+              label="المحمصة (اختياري)"
+              name="roasterName"
+              value={product.roasterName}
+              onChange={handleChange}
+              options={ROASTERS}
+            />
+          </>
         )}
 
         {product.category === 'حناء بودر' && (

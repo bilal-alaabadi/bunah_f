@@ -439,6 +439,10 @@ ${linesProducts}${depositBlock}
                             <td className="py-2 px-3">
                               <div>
                                 <p className="font-medium text-sm">{product.name || 'منتج غير محدد'}</p>
+                                {/* 👇 اسم المحمصة (إن وُجد) */}
+                                {!!product.roasterName && String(product.roasterName).trim() && (
+                                  <p className="text-xs text-gray-500">المحمصة: {product.roasterName}</p>
+                                )}
                                 {product.selectedSize && <p className="text-xs text-gray-500">الحجم: {product.selectedSize}</p>}
                                 {product.selectedColor && <p className="text-xs text-gray-500">اللون: {product.selectedColor}</p>}
                                 {renderMeasurements(product.measurements)}
@@ -474,6 +478,10 @@ ${linesProducts}${depositBlock}
                           </div>
                           <div className="flex-grow">
                             <p className="font-medium text-sm">{product.name || 'منتج غير محدد'}</p>
+                            {/* 👇 اسم المحمصة (إن وُجد) */}
+                            {!!product.roasterName && String(product.roasterName).trim() && (
+                              <p className="text-xs text-gray-500">المحمصة: {product.roasterName}</p>
+                            )}
                             {product.selectedSize && <p className="text-xs text-gray-500">الحجم: {product.selectedSize}</p>}
                             {product.selectedColor && <p className="text-xs text-gray-500">اللون: {product.selectedColor}</p>}
                             {renderMeasurements(product.measurements)}

@@ -1,3 +1,4 @@
+// ========================= src/redux/features/products/productsApi.js (نهائي) =========================
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getBaseUrl } from "../../../utils/baseURL";
 
@@ -9,11 +10,12 @@ const productsApi = createApi({
   }),
   tagTypes: ["Product", "ProductList"],
   endpoints: (builder) => ({
-    // جلب جميع المنتجات مع إمكانية التصفية والترتيب
+
+    // جلب جميع المنتجات مع الفلاتر (الفئة + المحمصة + السعر + البحث + الترتيب + الترقيم)
     fetchAllProducts: builder.query({
       query: ({
         category,
-        gender,
+        roasterName,           // 👈 مهم لفلترة المحامص
         minPrice,
         maxPrice,
         search,
@@ -22,16 +24,33 @@ const productsApi = createApi({
         limit = 10,
       }) => {
         const params = {
-          page: page.toString(),
-          limit: limit.toString(),
+          page: String(page),
+          limit: String(limit),
           sort,
         };
 
-        if (category && category !== "الكل") params.category = category;
-        if (gender) params.gender = gender;
-        if (minPrice) params.minPrice = minPrice;
-        if (maxPrice) params.maxPrice = maxPrice;
-        if (search) params.search = search;
+        // الفئة
+        if (category && category !== "الكل" && category !== "all") {
+          params.category = category;
+        }
+
+        // المحمصة — فقط إذا أرسلت وليست "الكل"
+        if (roasterName && roasterName !== "الكل" && roasterName !== "all") {
+          params.roasterName = roasterName;
+        }
+
+        // السعر
+        if (minPrice !== undefined && minPrice !== null && minPrice !== "") {
+          params.minPrice = String(minPrice);
+        }
+        if (maxPrice !== undefined && maxPrice !== null && maxPrice !== "") {
+          params.maxPrice = String(maxPrice);
+        }
+
+        // البحث (اختياري — إذا كان لديك راوتر يدعمه)
+        if (search && search.trim()) {
+          params.search = search.trim();
+        }
 
         const queryParams = new URLSearchParams(params).toString();
         return `/?${queryParams}`;
@@ -50,30 +69,33 @@ const productsApi = createApi({
           : ["ProductList"],
     }),
 
-fetchProductById: builder.query({
-  query: (id) => `/product/${id}`, // تغيير المسار هنا
-  transformResponse: (response) => {
-    if (!response?.product) {
-      throw new Error('المنتج غير موجود');
-    }
-    
-    const { product } = response;
-    return {
-      _id: product._id,
-      name: product.name,
-      category: product.category,
-      size: product.size || '',
-      price: product.price,
-      oldPrice: product.oldPrice || '',
-      description: product.description,
-      image: Array.isArray(product.image) ? product.image : [product.image],
-      author: product.author
-    };
-  },
-  providesTags: (result, error, id) => [{ type: "Product", id }],
-}),
+    // جلب منتج واحد بالتفصيل
+    fetchProductById: builder.query({
+      query: (id) => `/product/${id}`,
+      transformResponse: (response) => {
+        if (!response?.product) {
+          throw new Error("المنتج غير موجود");
+        }
+        const { product } = response;
+        return {
+          _id: product._id,
+          name: product.name,
+          category: product.category,
+          size: product.size || "",
+          price: product.price,
+          oldPrice: product.oldPrice || "",
+          description: product.description,
+          image: Array.isArray(product.image) ? product.image : [product.image],
+          author: product.author,
+          weightGrams: product.weightGrams ?? null,
+          roasterName: product.roasterName ?? "",
+          inStock: product.inStock,
+        };
+      },
+      providesTags: (result, error, id) => [{ type: "Product", id }],
+    }),
 
-    // جلب المنتجات المرتبطة (منتجات مشابهة)
+    // منتجات مرتبطة (إن كان الراوتر موجود)
     fetchRelatedProducts: builder.query({
       query: (id) => `/related/${id}`,
       providesTags: (result, error, id) => [
@@ -118,18 +140,14 @@ fetchProductById: builder.query({
       ],
     }),
 
-    // بحث عن المنتجات
+    // بحث (اختياري حسب راوتر السيرفر لديك)
     searchProducts: builder.query({
-      query: (searchTerm) => `/search?q=${searchTerm}`,
-      transformResponse: (response) => {
-        return response.map(product => ({
+      query: (searchTerm) => `/search?q=${encodeURIComponent(searchTerm)}`,
+      transformResponse: (response) =>
+        response.map((product) => ({
           ...product,
-          price: product.category === 'حناء بودر' 
-            ? product.price 
-            : product.regularPrice,
           images: Array.isArray(product.image) ? product.image : [product.image],
-        }));
-      },
+        })),
       providesTags: (result) =>
         result
           ? [
@@ -139,7 +157,7 @@ fetchProductById: builder.query({
           : ["ProductList"],
     }),
 
-    // جلب المنتجات الأكثر مبيعاً
+    // الأكثر مبيعاً (إن كان الراوتر موجود)
     fetchBestSellingProducts: builder.query({
       query: (limit = 4) => `/best-selling?limit=${limit}`,
       providesTags: ["ProductList"],

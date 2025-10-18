@@ -93,7 +93,11 @@ const SingleProduct = () => {
         <div className="md:w-1/2 w-full">
           <h3 className="text-2xl font-semibold mb-4">{data.name}</h3>
           <p className="text-gray-600 mb-2">الفئة: {data.category}</p>
-          <p className="text-gray-600 mb-4">{data.description}</p>
+{data.roasterName && (
+  <p className="text-gray-600 mb-2">المحمصة: {data.roasterName}</p>
+)}
+<p className="text-gray-600 mb-4">{data.description}</p>
+
 
           <div className="text-xl text-[#751e26] mb-6">
             السعر: {unitPrice.toFixed(2)} {currency}

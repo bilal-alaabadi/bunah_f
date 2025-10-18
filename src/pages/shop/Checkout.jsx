@@ -1,4 +1,3 @@
-// ========================= src/components/Checkout/Checkout.jsx (نهائي) =========================
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RiBankCardLine } from "react-icons/ri";
@@ -23,6 +22,9 @@ const Checkout = () => {
   // خيار دولة من دول الخليج (يظهر فقط إذا country === "دول الخليج")
   const [gulfCountry, setGulfCountry] = useState("");
 
+  // ✅ طريقة التوصيل داخل عُمان: "المنزل" (2 ر.ع) أو "المكتب" (1 ر.ع)
+  const [shippingMethod, setShippingMethod] = useState("المنزل");
+
   const { products, totalPrice, country, giftCard } = useSelector((state) => state.cart);
 
   const currency = country === "دول الخليج" ? "د.إ" : "ر.ع.";
@@ -34,9 +36,9 @@ const Checkout = () => {
       // الإمارات = 4 ر.ع ، غيرها = 5 ر.ع
       return gulfCountry === "الإمارات" ? 4 : 5;
     }
-    // داخل عُمان بقيت 2 ر.ع كما كانت
-    return 2;
-  }, [country, gulfCountry]);
+    // ✅ داخل عُمان: المنزل=2 ، المكتب=1
+    return shippingMethod === "المكتب" ? 1 : 2;
+  }, [country, gulfCountry, shippingMethod]);
 
   // بعد ذلك تُعرَض بحسب العملة المختارة (قد تُحوَّل إلى AED إن كانت دول الخليج)
   const shippingFee = baseShippingFee * exchangeRate;
@@ -93,7 +95,7 @@ const Checkout = () => {
         image: Array.isArray(product.image) ? product.image[0] : product.image,
         measurements: product.measurements || {},
         category: product.category || "",
-        // ✅ إرسال بطاقة الهدية الخاصة بالمنتج كما هي (إن وُجدت)
+  roasterName: product.roasterName || "", // ✅ أضِف هذا السطر
         giftCard:
           product.giftCard &&
           (String(product.giftCard.from || "").trim() ||
@@ -116,6 +118,7 @@ const Checkout = () => {
       description,
       email,
       depositMode: !!payDepositEffective,
+      shippingMethod, // ✅ جديد: يحدد 1 أو 2 داخل عُمان
       // نُرسل بطاقة الهدية العامة إن وُجدت
       giftCard:
         giftCard &&
@@ -230,7 +233,6 @@ const Checkout = () => {
                     }}
                   >
                     <option value="عُمان">عُمان</option>
-                    <option value="دول الخليج">دول الخليج</option>
                   </select>
                 </div>
               </div>
@@ -256,6 +258,21 @@ const Checkout = () => {
                     الشحن: الإمارات <span className="font-semibold">4 ر.ع</span> — بقية دول الخليج{" "}
                     <span className="font-semibold">5 ر.ع</span>.
                   </p>
+                </div>
+              )}
+
+              {/* ✅ طريقة التوصيل داخل عُمان */}
+              {country !== "دول الخليج" && (
+                <div>
+                  <label className="block text-gray-700 mb-2">طريقة التوصيل داخل عُمان</label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-white"
+                    value={shippingMethod}
+                    onChange={(e) => setShippingMethod(e.target.value)}
+                  >
+                    <option value="المنزل">المنزل (2 ر.ع)</option>
+                    <option value="المكتب">المكتب (1 ر.ع)</option>
+                  </select>
                 </div>
               )}
 
@@ -319,6 +336,12 @@ const Checkout = () => {
                   <div className="flex items-start justify-between gap-3">
                     <span className="text-gray-700">
                       {product.name} × {product.quantity}
+                      {/* تحت اسم المنتج في قائمة الطلب */}
+                      {!!product.roasterName && String(product.roasterName).trim() && (
+                        <span className="text-xs text-gray-600 block mt-0.5">
+                          المحمصة: {product.roasterName}
+                        </span>
+                      )}
                     </span>
                     <span className="text-gray-900 font-medium whitespace-nowrap">
                       {Math.max(
@@ -445,7 +468,7 @@ const Checkout = () => {
               {/* زر إتمام الطلب تحت بطاقة ثواني */}
               <button
                 onClick={makePayment}
-                className="mt-4 w-full bg-[#751e26] text-white px-6 py-3 rounded-md hover:bg-[#b97d78] transition-colors"
+                className="mt-4 w-full bg-[#751e26] text-white px-6 py-3 rounded-md  transition-colors"
                 disabled={products.length === 0}
               >
                 إتمام الطلب

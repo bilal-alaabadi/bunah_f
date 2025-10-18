@@ -1,27 +1,56 @@
-// ShopPage.jsx
-import React, { useState, useEffect } from 'react';
+// ========================= ShopPage.jsx (نهائي) =========================
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCards from './ProductCards';
 import ShopFiltering from './ShopFiltering';
 import { useFetchAllProductsQuery } from '../../redux/features/products/productsApi';
 import imge from "../../assets/بنر-قهوة.png";
 
+const ROAST_CATEGORIES = ['المحامص السعودية', 'المحامص العمانية'];
+
 const filters = {
-  categories: ['الكل', 'المحامص السعودية', 'المحامص العمانية','أدوات قهوة','شاي']
+  categories: ['الكل', 'المحامص السعودية', 'المحامص العمانية', 'أدوات قهوة', 'شاي'],
+  // قائمة المحامص (تظهر أفقياً عند اختيار إحدى فئات المحامص) — أول عنصر دائمًا "الكل"
+  roasters: [
+    'الكل',
+    'محمصة الرياض',
+    'محمصة بريهانت',
+    'محمصة اورو',
+    'محمصة سويل',
+    'محمصة الفارس الاسود',
+    'محمصة اش',
+    'محمصة ترايسكل',
+    'محمصة دبليو',
+    'محمصة سبعة جرام',
+    'محمصة بيت التحميص',
+    'محمصة صواع',
+    'محمصة هاف مليون',
+    'محمصة عُمق',
+    'محمصة 12 كوب',
+    'محمصة اولالا',
+    'محمصة كوف',
+    'محمصة كفة',
+  ],
 };
 
 const ShopPage = () => {
   const [searchParams] = useSearchParams();
 
   const [filtersState, setFiltersState] = useState({
-    category: 'الكل'
+    category: 'الكل',
+    roasterName: 'الكل', // يظهر فقط مع فئات المحامص
   });
 
   // التهيئة حسب باراميتر الرابط ?category=
   useEffect(() => {
     const categoryFromURL = searchParams.get('category');
     if (categoryFromURL && filters.categories.includes(categoryFromURL)) {
-      setFiltersState({ category: categoryFromURL });
+      setFiltersState((prev) => ({
+        ...prev,
+        category: categoryFromURL,
+        // عند التغيير لفئة غير المحامص نصفر المحمصة للكل
+        roasterName: ROAST_CATEGORIES.includes(categoryFromURL) ? prev.roasterName : 'الكل',
+      }));
     }
   }, [searchParams]);
 
@@ -29,20 +58,27 @@ const ShopPage = () => {
   const [ProductsPerPage] = useState(8);
   const [showFilters, setShowFilters] = useState(false);
 
-  const { category } = filtersState;
+  const { category, roasterName } = filtersState;
+
+  const isRoastCategory = useMemo(
+    () => ROAST_CATEGORIES.includes(category),
+    [category]
+  );
 
   useEffect(() => {
     setCurrentPage(1);
   }, [filtersState]);
 
-  const { data: { products = [], totalPages, totalProducts } = {}, error, isLoading } = useFetchAllProductsQuery({
-    category: category !== 'الكل' ? category : undefined,
-    page: currentPage,
-    limit: ProductsPerPage,
-  });
+  const { data: { products = [], totalPages = 1, totalProducts = 0 } = {}, error, isLoading } =
+    useFetchAllProductsQuery({
+      category: category !== 'الكل' ? category : undefined,
+      roasterName: isRoastCategory && roasterName !== 'الكل' ? roasterName : undefined,
+      page: currentPage,
+      limit: ProductsPerPage,
+    });
 
   const clearFilters = () => {
-    setFiltersState({ category: 'الكل' });
+    setFiltersState({ category: 'الكل', roasterName: 'الكل' });
   };
 
   const handlePageChange = (pageNumber) => {
@@ -54,8 +90,8 @@ const ShopPage = () => {
   if (isLoading) return <div className="text-center py-8 text-[#751e26]">جاري تحميل المنتجات...</div>;
   if (error) return <div className="text-center py-8 text-red-500">حدث خطأ أثناء تحميل المنتجات.</div>;
 
-  const startProduct = (currentPage - 1) * ProductsPerPage + 1;
-  const endProduct = Math.min(startProduct + ProductsPerPage - 1, totalProducts);
+  const startProduct = totalProducts ? (currentPage - 1) * ProductsPerPage + 1 : 0;
+  const endProduct = totalProducts ? Math.min(startProduct + ProductsPerPage - 1, totalProducts) : 0;
 
   return (
     <>
@@ -78,7 +114,7 @@ const ShopPage = () => {
           <div className='md:w-1/4'>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className='md:hidden w-full bg-[#751e26] text-white py-2 px-4 rounded-md mb-4 flex items-center justify-between  transition-colors'
+              className='md:hidden w-full bg-[#751e26] text-white py-2 px-4 rounded-md mb-4 flex items-center justify-between transition-colors'
             >
               <span>{showFilters ? 'إخفاء الفلاتر' : 'تصفية المنتجات'}</span>
               <svg
@@ -98,17 +134,18 @@ const ShopPage = () => {
                 filtersState={filtersState}
                 setFiltersState={setFiltersState}
                 clearFilters={clearFilters}
+                isRoastCategory={isRoastCategory}
               />
             </div>
           </div>
 
           {/* Products List */}
           <div className='md:w-3/4'>
-            <div className='flex justify-between items-center mb-6'>
+            {/* <div className='flex justify-between items-center mb-6'>
               <h3 className='text-lg font-medium text-[#751e26]'>
                 عرض {startProduct}-{endProduct} من {totalProducts} منتج
               </h3>
-            </div>
+            </div> */}
 
             {products.length > 0 ? (
               <>
@@ -142,8 +179,8 @@ const ShopPage = () => {
                               onClick={() => handlePageChange(index + 1)}
                               className={`w-10 h-10 flex items-center justify-center rounded-md border transition-colors ${
                                 active
-                                  ? 'bg-[#751e26] text-white border-[#751e26] '
-                                  : 'border-[#751e26] text-[#751e26] bg-white  hover:text-white'
+                                  ? 'bg-[#751e26] text-white border-[#751e26]'
+                                  : 'border-[#751e26] text-[#751e26] bg-white hover:text-white'
                               }`}
                             >
                               {index + 1}
@@ -158,7 +195,7 @@ const ShopPage = () => {
                         className={`px-4 py-2 rounded-md border transition-colors ${
                           currentPage === totalPages
                             ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-gray-200'
-                            : 'border-[#751e26] text-[#751e26]  hover:text-white'
+                            : 'border-[#751e26] text-[#751e26] hover:text-white'
                         }`}
                       >
                         التالي
@@ -172,7 +209,7 @@ const ShopPage = () => {
                 <p className="text-lg text-[#751e26]">لا توجد منتجات متاحة حسب الفلتر المحدد</p>
                 <button
                   onClick={clearFilters}
-                  className="mt-4 px-4 py-2 bg-[#751e26] text-white rounded-md  transition-colors"
+                  className="mt-4 px-4 py-2 bg-[#751e26] text-white rounded-md transition-colors"
                 >
                   عرض جميع المنتجات
                 </button>

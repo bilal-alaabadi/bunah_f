@@ -74,7 +74,7 @@ const Navbar = () => {
           >
             <button
               onClick={handleMobileMenuToggle}
-              className="text-[#751e26] text-2xl"
+              className="text-[#751e26] text-3xl"
             >
               <i className="ri-menu-line"></i>
             </button>
@@ -131,22 +131,27 @@ const Navbar = () => {
                   )}
                 </div>
               ) : (
-                <Link to="/login" className="text-[#751e26] text-2xl">
+                <Link to="/login" className="text-[#751e26] text-3xl">
                   <i className="ri-user-line"></i>
                 </Link>
               )}
 
+              {/* MOBILE CART (BIGGER) */}
               <button
-                onClick={handleCartToggle}
-                className="relative text-[#751e26] text-2xl"
-              >
-                <i className="ri-shopping-bag-line"></i>
-                {itemsCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#42a0ec] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {itemsCount}
-                  </span>
-                )}
-              </button>
+  onClick={handleCartToggle}
+  className="relative text-[#751e26] text-3xl" // ← بدل 4xl إلى 2xl
+  aria-label="فتح السلة"
+>
+  <i className="ri-shopping-bag-line"></i>
+  {itemsCount > 0 && (
+    <span
+      className="absolute -top-2 -right-2 bg-[#751e26] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+    >
+      {itemsCount}
+    </span>
+  )}
+</button>
+
             </div>
           </div>
 
@@ -157,30 +162,36 @@ const Navbar = () => {
             ].join(" ")}
           >
             <div className="flex items-center gap-6">
-              <select
+              {/* <select
                 value={country}
                 onChange={handleCountryChange}
                 className="p-2 border rounded-md bg-white text-[#751e26]"
               >
                 <option value="عمان">عمان (ر.ع.)</option>
                 <option value="دول الخليج">دول الخليج (د.إ)</option>
-              </select>
+              </select> */}
 
+              {/* DESKTOP CART (BIGGER) */}
               <button
-                onClick={handleCartToggle}
-                className="relative text-[#751e26]"
-              >
-                <i className="ri-shopping-bag-line"></i>
-                {itemsCount > 0 && (
-                  <span className={[
-                      "absolute -top-2 -right-2 bg-[#42a0ec] text-white rounded-full flex items-center justify-center",
-                      isScrolled ? "text-xs w-5 h-5" : "text-sm w-6 h-6"
-                    ].join(" ")}
-                  >
-                    {itemsCount}
-                  </span>
-                )}
-              </button>
+  onClick={handleCartToggle}
+  className="relative text-[#751e26] text-3xl" // ← بدل 4xl إلى 2xl
+  aria-label="فتح السلة"
+>
+  <i className="ri-shopping-bag-line"></i>
+  {itemsCount > 0 && (
+    <span
+      className={[
+        "absolute bg-[#751e26] text-white rounded-full flex items-center justify-center",
+        isScrolled
+          ? "-top-2 -right-2 w-10 h-5 text-xs"
+          : "-top-2 -right-2 w-10 h-6 text-sm"
+      ].join(" ")}
+    >
+      {itemsCount}
+    </span>
+  )}
+</button>
+
             </div>
 
             <div className="flex-grow flex justify-center">
@@ -205,7 +216,7 @@ const Navbar = () => {
                     alt="صورة المستخدم"
                     className={[
                       "rounded-full cursor-pointer border-2 border-gray-200 transition-all duration-300",
-                      isScrolled ? "w-10 h-10" : "w-12 h-12"
+                      isScrolled ? "w-10 h-10" : "w-10 h-10"
                     ].join(" ")}
                   />
                   {isDropDownOpen && (
@@ -270,10 +281,8 @@ const Navbar = () => {
               </button>
 
               <div className="w-full">
-                <label htmlFor="countrySelectMobile" className="block text-sm text-[#751e26] mb-2 text-right">
-                  اختر الدولة لعرض الأسعار:
-                </label>
-                <select
+
+                {/* <select
                   id="countrySelectMobile"
                   value={country}
                   onChange={handleCountryChange}
@@ -281,7 +290,7 @@ const Navbar = () => {
                 >
                   <option value="عمان">عمان 🇴🇲 (ر.ع.)</option>
                   <option value="دول الخليج">دول الخليج (د.إ)</option>
-                </select>
+                </select> */}
               </div>
 
               <Link to="/shop" onClick={handleMobileMenuToggle} className="w-full text-center py-4 px-6 font-medium text-xl text-[#751e26]">

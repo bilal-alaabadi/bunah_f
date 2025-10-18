@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import log from "../../assets/Bunnah_logo_no_bg.png"; // شعار الأنثور
 
 const TrendingProducts = ({ onProductsLoaded }) => {
-  const [visibleProducts, setVisibleProducts] = useState(4);
+  const [visibleProducts, setVisibleProducts] = useState(8);
   const { country } = useSelector((state) => state.cart);
 
   const {
@@ -32,7 +32,7 @@ const TrendingProducts = ({ onProductsLoaded }) => {
   const currency = isAEDCountry ? 'د.إ' : 'ر.ع.';
   const exchangeRate = isAEDCountry ? 9.5 : 1;
 
-  const loadMoreProducts = () => setVisibleProducts((prev) => prev + 4);
+  const loadMoreProducts = () => setVisibleProducts((prev) => prev + 8);
 
   const getFirstPrice = (product) => {
     if (!product) return 0;
@@ -159,7 +159,7 @@ const TrendingProducts = ({ onProductsLoaded }) => {
       {visibleProducts < products.length && (
         <div className="product__btn text-center mt-8" dir="rtl">
           <button
-            className="hover:bg-[#c19e22] bg-[#CB908B] text-white px-6 py-2 rounded-md transition-colors"
+            className="hover:bg-[#c19e22] bg-[#9B2D1F] text-white px-6 py-2 rounded-md transition-colors"
             onClick={loadMoreProducts}
           >
             عرض المزيد
