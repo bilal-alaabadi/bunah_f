@@ -1,5 +1,5 @@
 // ========================= src/pages/shop/SingleProduct.jsx =========================
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFetchProductByIdQuery } from '../../../redux/features/products/productsApi';
@@ -18,25 +18,13 @@ const SingleProduct = () => {
   const currency = isAEDCountry ? 'د.إ' : 'ر.ع.';
   const exchangeRate = isAEDCountry ? 9.5 : 1;
 
-  useEffect(() => {
-    // عند تغيير المنتج، اضبط عداد الكمية ليبدأ من 1 ولكن لا يتجاوز المتوفر
-    if (data?.stockQty >= 1) {
-      setCartQty(1);
-    } else {
-      setCartQty(0);
-    }
-  }, [data]);
-
   if (isLoading) return <p>جاري التحميل...</p>;
   if (error) return <p>حدث خطأ أثناء تحميل تفاصيل المنتج.</p>;
   if (!data) return null;
 
-  const unitPrice = (data.price || 0) * exchangeRate;
-  const stock = Number(data.stockQty || 0);
-  const isOut = stock <= 0;
+  const unitPrice = (data.regularPrice || data.price || 0) * exchangeRate;
 
   const handleAddToCart = () => {
-    if (isOut || cartQty < 1) return;
     dispatch(
       addToCart({
         ...data,
@@ -58,24 +46,11 @@ const SingleProduct = () => {
       prev === 0 ? data.image.length - 1 : prev - 1
     );
 
-  const decQty = () => {
-    setCartQty((q) => {
-      const next = q - 1;
-      if (next < 1) return 1;
-      return next;
-    });
-  };
-
-  const incQty = () => {
-    setCartQty((q) => {
-      const next = q + 1;
-      if (next > stock) return stock;
-      return next;
-    });
-  };
-
   return (
-    <section className="section__container bg-gradient-to-r mt-8" dir="rtl">
+    <section
+      className="section__container bg-gradient-to-r  mt-8"
+      dir="rtl"
+    >
       <div className="flex flex-col items-center md:flex-row gap-8">
         {/* الصور */}
         <div className="md:w-1/2 w-full relative">
@@ -97,14 +72,12 @@ const SingleProduct = () => {
                   <button
                     onClick={prevImage}
                     className="absolute left-0 top-1/2 -translate-y-1/2 bg-[#751e26] text-white p-2 rounded-full"
-                    aria-label="previous-image"
                   >
                     ‹
                   </button>
                   <button
                     onClick={nextImage}
                     className="absolute right-0 top-1/2 -translate-y-1/2 bg-[#751e26] text-white p-2 rounded-full"
-                    aria-label="next-image"
                   >
                     ›
                   </button>
@@ -118,24 +91,13 @@ const SingleProduct = () => {
 
         {/* التفاصيل */}
         <div className="md:w-1/2 w-full">
-          <h3 className="text-2xl font-semibold mb-2">{data.name}</h3>
+          <h3 className="text-2xl font-semibold mb-4">{data.name}</h3>
+          <p className="text-gray-600 mb-2">الفئة: {data.category}</p>
+{data.roasterName && (
+  <p className="text-gray-600 mb-2">المحمصة: {data.roasterName}</p>
+)}
+<p className="text-gray-600 mb-4">{data.description}</p>
 
-          {/* حالة/كمية المخزون */}
-          <div className="mb-3">
-            {isOut ? (
-              <span className="inline-block text-sm bg-red-100 text-red-700 px-3 py-1 rounded-md">
-                غير متوفر حالياً
-              </span>
-            ) : (
-              <span className="inline-block text-sm bg-green-100 text-green-700 px-3 py-1 rounded-md">
-                المتوفر بالمخزون: {stock}
-              </span>
-            )}
-          </div>
-
-          <p className="text-gray-600 mb-1">الفئة: {data.category}</p>
-          {data.size && <p className="text-gray-600 mb-1">الحجم: {data.size}</p>}
-          <p className="text-gray-600 mb-4">{data.description}</p>
 
           <div className="text-xl text-[#751e26] mb-6">
             السعر: {unitPrice.toFixed(2)} {currency}
@@ -145,30 +107,18 @@ const SingleProduct = () => {
           <div className="mb-6 flex items-center gap-4">
             <button
               type="button"
-              onClick={decQty}
-              disabled={isOut || cartQty <= 1}
-              className={`w-10 h-10 flex items-center justify-center rounded-md ${
-                isOut || cartQty <= 1
-                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                  : 'bg-[#751e26] text-white'
-              }`}
+              onClick={() => setCartQty((q) => (q > 1 ? q - 1 : 1))}
+              className="w-10 h-10 flex items-center justify-center bg-[#751e26] text-white rounded-md"
             >
               -
             </button>
-
             <div className="min-w-[3rem] text-center font-bold text-lg">
               {cartQty}
             </div>
-
             <button
               type="button"
-              onClick={incQty}
-              disabled={isOut || cartQty >= stock}
-              className={`w-10 h-10 flex items-center justify-center rounded-md ${
-                isOut || cartQty >= stock
-                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                  : 'bg-[#751e26] text-white'
-              }`}
+              onClick={() => setCartQty((q) => q + 1)}
+              className="w-10 h-10 flex items-center justify-center bg-[#751e26] text-white rounded-md"
             >
               +
             </button>
@@ -176,12 +126,7 @@ const SingleProduct = () => {
 
           <button
             onClick={handleAddToCart}
-            disabled={isOut || cartQty < 1}
-            className={`px-6 py-3 rounded-md hover:opacity-90 ${
-              isOut || cartQty < 1
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-[#751e26] text-white'
-            }`}
+            className="px-6 py-3 bg-[#751e26] text-white rounded-md hover:opacity-90"
           >
             إضافة إلى السلة
           </button>
